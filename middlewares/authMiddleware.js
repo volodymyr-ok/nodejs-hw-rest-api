@@ -1,18 +1,20 @@
 const RequestError = require("../helpers/RequestError");
 const jwt = require("jsonwebtoken");
+const { User } = require("../models/user");
 
-const auth = (req, res, next) => {
-  if (!req.headers.authorization) throw RequestError(401, "Not authorized");
-
-  const [tokenType, token] = req.headers.authorization.split(" ");
-
+const auth = async (req, _, next) => {
   try {
-    const user = jwt.decode(token, process.env.JWT_SECRET);
-    if (!user) throw new Error();
+    if (!req.headers.authorization) throw RequestError(401, "Not authorized");
+
+    const [bearer, token] = req.headers.authorization.split(" ");
+    if (bearer !== "Bearer") throw RequestError(401, "Not authorized");
+
+    const { id } = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(id);
+    if (!user || !user.token || user.token !== token) throw RequestError(401);
 
     req.user = user;
-    req.tokenType = tokenType;
-    req.token = token;
+
     next();
   } catch (err) {
     throw RequestError(401, "Please provide a valid token");
