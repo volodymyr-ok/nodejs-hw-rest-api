@@ -18,7 +18,7 @@ const auth = require("../../middlewares/authMiddleware");
 
 router.post("/register", validate(registerSchema), ctrlWrapper(registration));
 router.post("/login", validate(loginSchema), ctrlWrapper(login));
-router.post("/logout", auth, ctrlWrapper(logout));
+router.get("/logout", auth, ctrlWrapper(logout));
 router.get("/current", auth, ctrlWrapper(current));
 router.patch(
   "/",
