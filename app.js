@@ -20,6 +20,7 @@ app.use((_, res) => {
 });
 
 app.use((err, _, res, __) => {
+  console.log("Server error");
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
 });
